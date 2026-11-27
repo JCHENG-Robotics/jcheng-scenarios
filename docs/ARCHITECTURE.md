@@ -101,15 +101,21 @@ which is why the gate can archive it as evidence.
   format must be proposed to `jcheng-interfaces` and accepted before it is
   treated as stable.
 
-## 7. Capability-manifest deviation
+## 7. Capability manifest
 
-`jcheng-interfaces/schemas/capability-manifest.v1.schema.json` describes a
-domain-42 runtime capability: it requires a contract hash, `requires_lease: true`
-and `ros_domains: [42]`. This repository has none of those properties. Its
-`capability.yaml` is therefore the offline-catalog profile used by the BENCH
-repositories (`layer: scen`, `hardware_access: none`, empty topics), and
-`tests/test_contract.py` asserts that profile. This is a deliberate, tested
-deviation, not a schema violation to be "fixed" later.
+`capability.yaml` uses the canonical `capability-manifest.v1` shape so the
+organization admission check can compare every repository with one schema.
+Because this repository is offline, every runtime field is vacuous:
+
+- `safety.class: offline`, empty `scopes`;
+- `runtime.ros_domains: []`, empty `publishes` and `subscribes`;
+- `hardware_access: none`;
+- `requires_lease: true` is required by the schema and is **not** a lease
+  request. The catalog never acquires, holds or forwards a lease.
+
+`tests/test_contract.py` pins the exact key set, the interfaces range and the
+contract hash. A local format deviation is not allowed; a future runtime
+surface would need a reviewed manifest change, not an ad-hoc profile.
 
 ## 8. Non-goals
 

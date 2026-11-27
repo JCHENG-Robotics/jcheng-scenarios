@@ -8,11 +8,22 @@ All notable changes to this project are documented here. Format based on
 
 ### Added
 
-- Nothing yet.
+- `SCHEMA_OWNERSHIP.md`: every repository-local Schema now declares its owner,
+  version, status (`repo-local`), consumers and promotion trigger. The contract
+  test fails when a Schema file is not declared.
+- CI now runs on the organization merge queue (`merge_group`) and pins
+  `actions/setup-python` to a full commit SHA.
 
 ### Changed
 
-- Nothing yet.
+- `capability.yaml` now uses the canonical `capability-manifest.v1` shape
+  (`schema_version`, `contract`, `safety`, `hardware_access`, `runtime`) instead
+  of a custom offline profile. Because the repository is offline, `class` is
+  `offline`, `scopes` and `runtime` are empty, and `requires_lease: true` is a
+  schema-required vacuous value, not a lease request. The contract test pins the
+  exact shape, interfaces range and contract hash.
+- README, README.zh-CN and `docs/ARCHITECTURE.md` describe the canonical manifest
+  and link the ecosystem boundary specification.
 
 ## [0.1.0] — 2026-11-27
 

@@ -21,7 +21,7 @@ JCHENG Robotics 生态的声明式场景库。它把机器人应用场景——�
 | 输出 | 通过校验的目录、确定性的文本/JSON 校验报告、进程退出码 |
 | 硬件访问 | `none`（`capability.yaml`） |
 | 拥有设备 | 无。没有 `/dev/*`、串口、CAN、GPIO 或相机设备。 |
-| 运动权限 | `none`；`control_path: none` |
+| 运动权限 | `none`；无租约、无控制路径、无运行时面 |
 | 禁止 | DDS 或 ROS 2 节点、设备访问、任务执行、控制或意图发布、重复实现 applications/simulation/benchmark 的运行时行为、虚构参数或结果 |
 
 本仓库**不是**运行时能力。没有产品仓库导入它，它不在 `ecosystem.lock.yaml` 中，
