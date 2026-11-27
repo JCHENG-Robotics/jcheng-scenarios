@@ -1,0 +1,80 @@
+schema_version: jcheng.scenario.operational_constraints.v1
+id: ore_sorting.operational_constraints
+version: 0.1.0
+provenance:
+  author: JCHENG Robotics
+  created: 2026-11-27
+  updated: 2026-11-27
+  source_kind: design
+  sources:
+    - kind: internal_design
+      reference: jcheng-system/docs/SAFETY.md
+      note: The system layer owns lease, deadman, limits and the stop latch.
+    - kind: operator_input
+      reference: JCHENG Robotics workspace AGENTS.md
+      note: Per-session operator authorization and the no-e-stop limitation.
+business:
+  - id: throughput_target
+    statement: >-
+      Throughput is not set in v0.1.0. It must be derived from an
+      operator-accepted cycle-time budget before a threshold is declared.
+    verification: Unverified
+  - id: batch_traceability
+    statement: >-
+      Every future run must identify the scenario version, evaluation version
+      and dataset by hash; free-text result claims are not accepted.
+    verification: Unverified
+  - id: mixed_batch_definition
+    statement: >-
+      A batch is a single presentation of ore and gangue on the pick surface.
+      Batch size and size distribution are not fixed in v0.1.0.
+    verification: Unverified
+environment:
+  - id: lighting_variation
+    statement: >-
+      Diffuse indoor light is assumed. Direct sunlight, hard shadows and
+      flicker are outside the declared envelope and must be recorded.
+    verification: Unverified
+  - id: dust_and_debris
+    statement: >-
+      Rock dust and small debris are expected. Their effect on the camera and
+      gripper is not characterised.
+    verification: Unverified
+  - id: vibration
+    statement: The workcell is assumed stationary during a batch; external vibration is not characterised.
+    verification: Unverified
+  - id: human_access
+    statement: >-
+      The operator may enter the cell only when the system layer reports a
+      stopped and de-energised state, following the hardware workflow.
+    verification: Unverified
+risks:
+  - id: pinch_points
+    severity: high
+    description: The arm and gripper create pinch points at the pick surface and bins.
+    mitigation: >-
+      Keep the arm envelope clear during a supervised run and rely on the
+      system-layer stop path; the platform has no e-stop, brake or self-collision model.
+  - id: dropped_ore
+    severity: medium
+    description: An ore instance can be dropped between the pick surface and the bin.
+    mitigation: Record the drop as a failure; never count it as a successful pick.
+  - id: misclassification
+    severity: medium
+    description: Gangue can be placed in the ore bin or ore left on the pick surface.
+    mitigation: Evaluate misclassification as a separate metric with its own declared threshold.
+  - id: stale_scene
+    severity: high
+    description: Acting on an old scene observation can target a moved or absent instance.
+    mitigation: Make freshness a precondition and a failure condition; the system layer remains the runtime authority.
+  - id: bin_overflow
+    severity: low
+    description: The ore bin can fill during a long batch.
+    mitigation: Declare a batch size limit before any sustained run; not set in v0.1.0.
+safety_boundary:
+  statement: >-
+    This profile describes scenario constraints only. Runtime authority, lease,
+    deadman, limits and the stop latch remain in jcheng-system. A scenario
+    constraint is not a safety mechanism, and this repository has no path to
+    motion, devices or DDS.
+  owner: jcheng-system

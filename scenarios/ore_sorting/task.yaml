@@ -1,0 +1,99 @@
+schema_version: jcheng.scenario.task.v1
+id: ore_sorting.task
+version: 0.1.0
+provenance:
+  author: JCHENG Robotics
+  created: 2026-11-27
+  updated: 2026-11-27
+  source_kind: design
+  sources:
+    - kind: internal_design
+      reference: jcheng-perception/docs/ORE_SCENE_UNDERSTANDING.md
+      note: Advisory scene state and the boundary against motion authority.
+    - kind: internal_design
+      reference: jcheng-applications/docs/ARCHITECTURE.md
+      note: Task sequencing and gateway intent submission belong to applications.
+goal:
+  statement: >-
+    Transfer every visible ore instance from the pick surface into the ore bin
+    while leaving gangue on the pick surface. The task is declarative: it does
+    not prescribe joint trajectories, grasp sequencing or retry policy.
+  target_class: ore
+  destination: ore_bin
+preconditions:
+  - id: cell_configured
+    description: The declared stations, frames and bins match the physical workcell.
+    predicate: null
+    measurable: false
+    verification: Unverified
+    note: Requires a measured workcell check before any supervised run.
+  - id: operator_authorization
+    description: A supervising operator authorizes the session before any motion.
+    predicate: null
+    measurable: false
+    verification: Unverified
+    note: The system layer records per-session authorization; this profile cannot grant it.
+  - id: scene_available
+    description: A fresh, valid scene observation covers the whole pick surface.
+    predicate: scene.valid == true and scene.stale == false
+    measurable: true
+    verification: Unverified
+  - id: no_human_in_envelope
+    description: No human is inside the robot envelope when the task starts.
+    predicate: count(human inside robot_envelope) == 0
+    measurable: true
+    verification: Unverified
+success_conditions:
+  - id: no_visible_ore_on_pick_surface
+    description: No ore instance remains visible on the pick surface at the final scene check.
+    predicate: count(ore on pick_surface) == 0
+    measurable: true
+    verification: Unverified
+    note: A covered instance that is not visible is a known limitation, not a success.
+  - id: ore_inside_bin
+    description: The number of ore instances inside the ore bin is at least the number observed at task start.
+    predicate: count(ore inside ore_bin) >= count(ore observed at start)
+    measurable: true
+    verification: Unverified
+failure_conditions:
+  - id: human_in_envelope
+    description: A human enters the robot envelope during the task.
+    predicate: count(human inside robot_envelope) > 0
+    measurable: true
+    verification: Unverified
+    note: The system layer owns the stop path; this condition only classifies the run.
+  - id: scene_stale
+    description: The scene observation exceeds the declared freshness bound before a pick.
+    predicate: scene.age_ms > freshness_bound_ms
+    measurable: true
+    verification: Unverified
+  - id: target_unreachable
+    description: No remaining ore instance has an advisory reachable grasp target.
+    predicate: count(reachable ore targets) == 0 and count(ore on pick_surface) > 0
+    measurable: true
+    verification: Unverified
+  - id: unrecoverable_motion_fault
+    description: The system layer reports a stop-latch or hardware fault that ends the session.
+    predicate: system.stop_latched == true
+    measurable: true
+    verification: Unverified
+constraints:
+  - id: motion_via_system_only
+    statement: >-
+      Any future motion is submitted as intent through the system gateway and
+      executed only by ExecuteMotion under lease, deadman, limits and the stop
+      latch. This repository never commands motion.
+    verification: Unverified
+  - id: no_grade_claim
+    statement: >-
+      The task never asserts ore grade, composition, mass or value. A class
+      label is an observable category, not an assay.
+    verification: Unverified
+  - id: no_gangue_to_ore_bin
+    statement: A gangue instance placed in the ore bin counts as a misclassification failure.
+    verification: Unverified
+out_of_scope:
+  - Grasp sequencing, retries, trajectory generation and idempotent submission belong to jcheng-applications and jcheng-system.
+  - Physical execution, device control and safety enforcement are not implemented by this repository.
+  - Ore grade, mass, composition and economic value are out of scope.
+  - Multi-robot coordination and mobile-base navigation are out of scope for v0.1.0.

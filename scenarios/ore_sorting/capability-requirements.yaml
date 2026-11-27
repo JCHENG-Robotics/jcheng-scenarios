@@ -1,0 +1,94 @@
+schema_version: jcheng.scenario.capability_requirements.v1
+id: ore_sorting.capability_requirements
+version: 0.1.0
+provenance:
+  author: JCHENG Robotics
+  created: 2026-11-27
+  updated: 2026-11-27
+  source_kind: design
+  sources:
+    - kind: internal_design
+      reference: jcheng-perception/docs/ORE_SCENE_UNDERSTANDING.md
+      note: Perception capabilities and the advisory-only output boundary.
+    - kind: internal_design
+      reference: AGENTS.md
+      note: Hardware boundary and the ExecuteMotion authority.
+matching_status: Not started
+vocabulary_status: local_draft
+device_requirements:
+  - id: arm_reach
+    capability: manipulation.arm.reach_m
+    requirement: ">= 0.45 m from the robot base to every station centre"
+    basis: design_target
+    rationale: >-
+      Covers the pick surface and both bins in the declared 0.80 m cell. The
+      value is a scenario requirement, not a measured ArmPi Ultra capability.
+    verification: Unverified
+  - id: arm_payload
+    capability: manipulation.arm.payload_kg
+    requirement: ">= 0.20 kg at the declared reach"
+    basis: design_target
+    rationale: A planning allowance for one rock plus gripper. No rock mass has been measured.
+    verification: Unverified
+  - id: gripper_aperture
+    capability: manipulation.gripper.aperture_m
+    requirement: ">= 0.04 m"
+    basis: design_target
+    rationale: >-
+      Declared for a representative ore size. The actual size distribution of
+      the target batch is not measured and may invalidate this requirement.
+    verification: Unverified
+  - id: arm_dof
+    capability: manipulation.arm.dof
+    requirement: ">= 4 independently commanded joints"
+    basis: design_target
+    rationale: Enough freedom to approach a target on the pick mat and release over a bin.
+    verification: Unverified
+  - id: camera_resolution
+    capability: sensing.camera.resolution_px
+    requirement: ">= 640 x 480 colour, fixed overhead mount"
+    basis: design_target
+    rationale: >-
+      Matches the S1 offline baseline resolution. It is a minimum declaration,
+      not a validated accuracy claim.
+    verification: Unverified
+algorithm_requirements:
+  - id: instance_segmentation
+    capability: perception.instance_segmentation
+    requirement: Separate visible ore and gangue instances in the pick area.
+    basis: design_target
+    rationale: The task needs instance identity; a bounding box alone cannot support per-instance success accounting.
+    verification: Unverified
+  - id: scene_state
+    capability: perception.scene_state
+    requirement: >-
+      Per-instance IDs, visible geometry, validity, freshness and explicit
+      unknowns, with no fabricated 3D fields.
+    basis: design_target
+    rationale: The task conditions reference scene validity and freshness.
+    verification: Unverified
+  - id: reachability
+    capability: perception.reachability
+    requirement: An advisory reachable or unreachable assessment per ore instance.
+    basis: design_target
+    rationale: The target_unreachable failure condition needs an explicit assessment rather than a guess.
+    verification: Unverified
+interface_requirements:
+  - id: system_motion
+    owner: jcheng-system
+    requirement: >-
+      Any motion is submitted as intent and executed only by ExecuteMotion
+      under lease, deadman, limits and the stop latch.
+    note: This repository has no runtime client and never publishes intent.
+  - id: perception_scene
+    owner: jcheng-perception
+    requirement: >-
+      Scene observations are advisory and carry validity, freshness and
+      unknown fields; they never become motion authority.
+    note: A cross-repository scene contract must be proposed to jcheng-interfaces before consumers rely on it.
+  - id: device_matching
+    owner: jcheng-devices
+    requirement: >-
+      Device profiles declare capabilities using the same versioned vocabulary
+      as this profile, enabling offline compatibility checks.
+    note: The repository is planned; the vocabulary is local until a contract review.

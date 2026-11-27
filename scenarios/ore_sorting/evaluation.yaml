@@ -1,0 +1,83 @@
+schema_version: jcheng.scenario.evaluation.v1
+id: ore_sorting.evaluation
+version: 0.1.0
+provenance:
+  author: JCHENG Robotics
+  created: 2026-11-27
+  updated: 2026-11-27
+  source_kind: design
+  sources:
+    - kind: internal_design
+      reference: jcheng-perception/docs/ORE_SCENE_EVALUATION.md
+      note: Data-source separation, no-ground-truth rule and failure accounting.
+    - kind: internal_design
+      reference: jcheng-benchmark/docs/BENCHMARK_PROTOCOL.md
+      note: Pre-registered suites, provenance-labelled reports and immutable results.
+metrics:
+  - id: pick_success_rate
+    definition: >-
+      Fraction of attempted ore picks that place the instance inside the ore
+      bin without a drop, a stop event or human intervention.
+    unit: ratio
+    direction: higher_is_better
+    threshold: null
+    threshold_status: not_set
+    verification: Unverified
+  - id: misclassification_rate
+    definition: Fraction of gangue instances placed in the ore bin.
+    unit: ratio
+    direction: lower_is_better
+    threshold: null
+    threshold_status: not_set
+    verification: Unverified
+  - id: cycle_time_s
+    definition: >-
+      Wall-clock seconds from the first pick intent to the final placement for
+      one declared batch.
+    unit: s
+    direction: lower_is_better
+    threshold: null
+    threshold_status: not_set
+    verification: Unverified
+  - id: placement_error_m
+    definition: Distance between the placed instance and the declared ore-bin centre.
+    unit: m
+    direction: lower_is_better
+    threshold: null
+    threshold_status: not_set
+    verification: Unverified
+  - id: scene_freshness_violations
+    definition: >-
+      Count of picks started while the scene observation exceeded the declared
+      freshness bound.
+    unit: count
+    direction: lower_is_better
+    threshold: null
+    threshold_status: not_set
+    verification: Unverified
+test_protocol:
+  levels:
+    - L0
+    - L1
+    - L2
+    - L3
+    - L4
+    - L5
+  data_sources:
+    - synthetic
+    - public
+    - recorded
+    - simulation
+    - hardware
+  rules:
+    - Synthetic, public, mock, simulation and replay results are reported separately and never as hardware validation.
+    - No accuracy or success claim is made without instance-level ground truth for the reported data source.
+    - A threshold is not set until a baseline and an operator-accepted task requirement exist.
+    - A failed bound stays failed; a rerun creates a new report and never overwrites the old one.
+    - Evaluation execution belongs to jcheng-benchmark; this repository only declares the specification.
+    - Hardware evaluation requires per-session operator authorization and a linked evidence path.
+reporting:
+  owner: jcheng-benchmark
+  note: >-
+    Reports must record the scenario version, evaluation version, data-source
+    class, dataset hash, operator and date. This repository ships no result.

@@ -1,0 +1,116 @@
+schema_version: jcheng.scenario.semantics.v1
+id: ore_sorting.semantics
+version: 0.1.0
+provenance:
+  author: JCHENG Robotics
+  created: 2026-11-27
+  updated: 2026-11-27
+  source_kind: design
+  sources:
+    - kind: internal_design
+      reference: jcheng-perception/docs/SCENE_REPRESENTATION.md
+      note: Visible-versus-true naming and the forbidden inference list.
+    - kind: internal_design
+      reference: jcheng-perception/docs/ORE_SCENE_EVALUATION.md
+      note: Ore and gangue are the only semantic classes used by the offline baseline.
+ontology:
+  - id: ore
+    label_en: ore
+    label_zh: 矿石
+    category: target
+    description: >-
+      A rock instance accepted for transfer to the ore bin. The label does not
+      imply grade, composition, mass or economic value.
+  - id: gangue
+    label_en: gangue
+    label_zh: 废石
+    category: distractor
+    description: >-
+      A rock instance rejected by the task. It remains on the pick surface in
+      v0.1.0 and is never placed in the ore bin.
+  - id: ore_bin
+    label_en: ore bin
+    label_zh: 矿石料箱
+    category: receptacle
+    description: Fixed receptacle for accepted ore instances.
+  - id: gangue_bin
+    label_en: gangue bin
+    label_zh: 废石料箱
+    category: receptacle
+    description: Reserved receptacle for a future classification task; unused in v0.1.0.
+  - id: pick_surface
+    label_en: pick surface
+    label_zh: 分拣台面
+    category: structure
+    description: Fixed mat on which the batch is presented.
+  - id: human
+    label_en: human
+    label_zh: 操作员
+    category: human
+    description: >-
+      A person. Presence inside the robot envelope is a failure condition and
+      an immediate system-level stop concern.
+attributes:
+  - id: instance_mask
+    applies_to:
+      - ore
+      - gangue
+    observable: true
+    note: Per-instance visible mask from the perception layer; not a full-object mask.
+  - id: visible_area_px
+    applies_to:
+      - ore
+      - gangue
+    observable: true
+    note: Visible pixel area only; occlusion changes it.
+  - id: visible_centroid_px
+    applies_to:
+      - ore
+      - gangue
+    observable: true
+    note: Centroid of the visible mask; explicitly not the true object centroid.
+  - id: visible_extent_px
+    applies_to:
+      - ore
+      - gangue
+    observable: true
+    note: Bounding extent of the visible mask; not the full object size.
+  - id: detection_confidence
+    applies_to:
+      - ore
+      - gangue
+    observable: true
+    note: Uncalibrated backend score unless a calibrated backend is declared.
+relations:
+  - id: adjacent
+    subject:
+      - ore
+      - gangue
+    object:
+      - ore
+      - gangue
+    description: Two visible instances touch or overlap in the image plane.
+  - id: supported_by
+    subject:
+      - ore
+      - gangue
+    object:
+      - pick_surface
+    description: The instance is supported by the pick surface.
+  - id: inside
+    subject:
+      - ore
+      - gangue
+    object:
+      - ore_bin
+      - gangue_bin
+    description: The instance is inside the declared receptacle footprint.
+forbidden_inferences:
+  - true_centroid
+  - true_center
+  - full_extent
+  - volume
+  - mass
+  - material_composition
+  - ore_grade
+  - economic_value

@@ -1,0 +1,81 @@
+# Capability manifest for the organization's admission check.
+#
+# jcheng-scenarios is a SCEN-layer repository: a declarative scenario catalog
+# that is validated offline. It is not a domain-42 runtime capability and is
+# not imported by any runtime repository.
+#
+# Deliberate schema deviation, asserted by tests/test_contract.py:
+# capability-manifest.v1 requires a contract hash, requires_lease: true and
+# ros_domains: [42]. Those fields describe a runtime motion capability and do
+# not apply to a repository that has no ROS node, no lease and no device path.
+# The benchmark repository uses the same offline-manifest convention.
+name: jcheng-scenarios
+version: 0.1.0
+layer: scen
+status: experimental
+
+runtime_roles:
+  offline-catalog:
+    host: operator workstation or CI (Linux/macOS), Python 3.10+
+    responsibilities:
+      - load the registry and every declarative scenario profile
+      - validate documents against versioned JSON Schemas
+      - check unique IDs, file references, cross-profile references and finite numbers
+      - report structural errors without rewriting the inputs
+    forbidden:
+      - joining a ROS graph or any DDS domain
+      - starting a ROS 2 node
+      - opening cameras, serial, CAN, GPIO or servo devices
+      - executing a task, publishing intent or commanding motion
+      - duplicating applications, simulation or benchmark runtime behaviour
+
+hardware_access:
+  kind: none
+  detail: >-
+    The catalog reads YAML and JSON files and has no ROS client library, no
+    device code and no network client. Every scenario is a declaration; none
+    is an execution path.
+
+motion_authority: none
+control_path: none
+fail_closed: true
+
+topics:
+  subscribes: []
+  publishes: []
+
+contracts:
+  status: not_applicable
+  note: >-
+    The registry, profile and schema formats are repository-local v1
+    documents. They are not jcheng-interfaces contracts and carry no contract
+    hash. If another repository consumes a scenario document, the format must
+    be proposed to jcheng-interfaces and accepted before it is treated as
+    stable.
+
+safety:
+  - The repository has no hardware, DDS, task-execution or motion path.
+  - A malformed document aborts validation; fields are never silently dropped.
+  - Duplicate YAML keys, duplicate IDs and references outside the catalog root are errors.
+  - Scenario constraints never replace jcheng-system's runtime safety mechanism.
+  - Unverified parameters, metrics and device compatibility stay labelled Unverified.
+  - No fake measurements, results or compatibility claims are accepted.
+  - A schema pass is not a safety certification or a task acceptance result.
+
+verification:
+  repo_gate: >-
+    scripts/check_repo_gate.sh (local 2026-11-27); CI workflow
+    .github/workflows/ci.yml
+  tests: >-
+    pytest contract, schema, registry, CLI, content and no-hardware boundary
+    tests under tests/
+  not_verified:
+    - no scenario has been matched to a device profile
+    - no scenario has been loaded by applications, simulation or benchmark
+    - no evaluation metric has a threshold or a result
+    - no hardware run exists; the catalog has no motion path
+
+schema_note: >-
+  capability-manifest.v1 targets domain-42 runtime capabilities. This manifest
+  is an offline-catalog profile with layer: scen, hardware_access: none and no
+  ROS domains. Do not "fix" it into a runtime manifest.

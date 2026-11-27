@@ -1,0 +1,20 @@
+schema_version: jcheng.scenario.registry.v1
+updated: 2026-11-27
+scenarios:
+  - id: ore_sorting
+    version: 0.1.0
+    path: scenarios/ore_sorting
+    profile: scenario.yaml
+    domain: mining
+    delivery: In progress
+    verification: Unverified
+    summary: >-
+      Declarative ore-sorting workcell: separate ore from gangue on a pick
+      surface and place ore in a bin. It declares the scenario only; it does
+      not execute tasks or command motion.
+    tags:
+      - ore
+      - sorting
+      - pick-and-place
+      - binning
+      - mining

@@ -1,0 +1,17 @@
+== required files
+== no LICENSE before the review closes
+== shell syntax
+== python syntax
+== no hardware, DDS, device or execution access
+...                                                                      [100%]
+== secret scan
+== schema self-check
+all schemas are valid Draft 2020-12 documents
+== catalog validation
+validated 1 scenario(s), 6 profile(s), 0 errors
+ore_sorting	0.1.0	In progress	Unverified	scenarios/ore_sorting
+== tests
+.............................................................            [100%]
+== documentation links
+........                                                                 [100%]
+== gate OK

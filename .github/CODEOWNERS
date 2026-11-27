@@ -1,0 +1,11 @@
+# Copy of the organization CODEOWNERS template, adjusted for this repository.
+# GitHub does not apply CODEOWNERS from the .github repository to other repos.
+
+* @JerichoCheng
+
+/docs/       @JerichoCheng
+/.github/    @JerichoCheng
+/schemas/    @JerichoCheng
+/scenarios/  @JerichoCheng
+/registry.yaml @JerichoCheng
+/scripts/    @JerichoCheng

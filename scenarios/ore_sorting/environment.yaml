@@ -1,0 +1,120 @@
+schema_version: jcheng.scenario.environment.v1
+id: ore_sorting.environment
+version: 0.1.0
+provenance:
+  author: JCHENG Robotics
+  created: 2026-11-27
+  updated: 2026-11-27
+  source_kind: design
+  sources:
+    - kind: internal_design
+      reference: jcheng-perception/docs/ORE_SCENE_UNDERSTANDING.md
+      note: Workcell stages and the advisory-only perception boundary.
+basis: design_target
+frames:
+  - name: cell
+    parent: world
+    note: >-
+      Cell frame at the front-centre of the pick surface, z=0 on the table.
+      Values are design declarations, not measurements.
+  - name: camera_optical
+    parent: cell
+    note: Overhead colour camera optical frame; extrinsic calibration is not provided.
+  - name: robot_base
+    parent: cell
+    note: Arm base frame; the actual mounting offset must be measured for device matching.
+stations:
+  - id: pick_surface
+    kind: pick
+    frame: cell
+    pose:
+      x_m: 0.30
+      y_m: 0.00
+      z_m: 0.00
+      yaw_deg: 0.0
+    footprint_m:
+      x_m: 0.45
+      y_m: 0.35
+    note: Matte pick mat holding a mixed ore and gangue batch.
+  - id: ore_bin
+    kind: drop
+    frame: cell
+    pose:
+      x_m: 0.30
+      y_m: -0.35
+      z_m: 0.00
+      yaw_deg: 0.0
+    footprint_m:
+      x_m: 0.18
+      y_m: 0.18
+    note: Receptacle for accepted ore instances.
+  - id: gangue_bin
+    kind: drop
+    frame: cell
+    pose:
+      x_m: 0.30
+      y_m: 0.35
+      z_m: 0.00
+      yaw_deg: 0.0
+    footprint_m:
+      x_m: 0.18
+      y_m: 0.18
+    note: >-
+      Reserved for a future classification task. The v0.1.0 task leaves
+      gangue on the pick surface and does not use this bin.
+  - id: inspection_zone
+    kind: inspection
+    frame: cell
+    pose:
+      x_m: 0.10
+      y_m: 0.00
+      z_m: 0.00
+      yaw_deg: 0.0
+    footprint_m:
+      x_m: 0.10
+      y_m: 0.10
+    note: Optional staging area for a second observation; not used by v0.1.0.
+zones:
+  - id: robot_envelope
+    kind: restricted
+    frame: cell
+    description: >-
+      Space swept by the arm. A human inside this zone is a task failure
+      condition and must be handled by the system layer's stop path.
+  - id: operator_zone
+    kind: human
+    frame: cell
+    description: Operator standing area outside the arm envelope.
+  - id: bin_exclusion
+    kind: exclusion
+    frame: cell
+    description: Bins are fixed; the scenario does not permit relocating them during a batch.
+lighting:
+  classes:
+    - normal
+    - bright
+  note: >-
+    Diffuse indoor lighting is assumed. Direct sunlight, hard shadows and
+    flicker are outside the declared envelope and must be recorded if observed.
+surfaces:
+  - id: pick_mat
+    material: matte grey polymer
+    note: >-
+      Chosen to separate ore from the background. Actual colour, texture and
+      reflectance must be verified on the real workcell.
+  - id: bin_interior
+    material: black polymer
+    note: Assumed non-reflective; not measured.
+constraints:
+  - id: table_height
+    statement: The pick surface is assumed at 0.75 m above the floor; measure it before device matching.
+    verification: Unverified
+  - id: overhead_clearance
+    statement: At least 0.55 m of clear space above the pick surface is assumed for the camera and arm.
+    verification: Unverified
+  - id: cell_footprint
+    statement: The declared cell fits within a 0.80 m by 0.80 m footprint, excluding the operator zone.
+    verification: Unverified
+  - id: fixed_station_pose
+    statement: Stations do not move within a batch; a moved station invalidates the scene observation.
+    verification: Unverified
