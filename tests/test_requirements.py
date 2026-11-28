@@ -53,6 +53,7 @@ def test_document_identity_fields() -> None:
         "schema",
         "scenario_id",
         "scenario_version",
+        "vocabulary_status",
         "content_hash",
         "task_id",
         "evaluation_id",
@@ -63,6 +64,7 @@ def test_document_identity_fields() -> None:
     assert document["schema"] == REQUIREMENTS_SCHEMA
     assert document["scenario_id"] == "ore_sorting"
     assert document["scenario_version"] == "0.1.0"
+    assert document["vocabulary_status"] == "local_draft"
     assert document["task_id"] == "ore_sorting.task@0.1.0"
     assert document["evaluation_id"] == "ore_sorting.evaluation@0.1.0"
 
@@ -103,9 +105,27 @@ def test_capabilities_cover_device_and_algorithm_requirements() -> None:
     assert [item["id"] for item in document["capabilities"]] == expected
     assert len(set(expected)) == len(expected)
     for item in document["capabilities"]:
-        assert item == {"id": item["id"], "required": True}
-    # The v0.1.0 source declares prose requirements, not machine parameters.
-    assert all("parameters" not in item for item in document["capabilities"])
+        assert item["required"] is True
+        assert item["verification"] == "Unverified"
+        assert item["statement"]
+        if item["requirement_owner"] == "device":
+            source = next(
+                row
+                for row in requirements["device_requirements"]
+                if row["capability"] == item["id"]
+            )
+            assert item["role"] == source["role"]
+            assert item["interface"] == source["interface"]
+            assert item.get("threshold") == source.get("threshold")
+            assert "deferred_to" not in item
+        else:
+            source = next(
+                row
+                for row in requirements["algorithm_requirements"]
+                if row["capability"] == item["id"]
+            )
+            assert item["deferred_to"] == source["owner"]
+            assert "role" not in item and "threshold" not in item
 
 
 def test_constraints_are_copied_from_the_task_specification() -> None:
@@ -214,6 +234,7 @@ def test_document_satisfies_the_applications_reference_contract() -> None:
         "schema",
         "scenario_id",
         "scenario_version",
+        "vocabulary_status",
         "content_hash",
         "task_id",
         "evaluation_id",
@@ -229,8 +250,20 @@ def test_document_satisfies_the_applications_reference_contract() -> None:
         assert re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._@:+-]{0,127}", reference)
         assert reference.rsplit("@", 1)[1] == document["scenario_version"]
     for item in document["capabilities"]:
-        assert set(item) <= {"id", "required", "parameters"}
+        assert set(item) <= {
+            "id",
+            "requirement_id",
+            "requirement_owner",
+            "required",
+            "statement",
+            "verification",
+            "role",
+            "interface",
+            "threshold",
+            "deferred_to",
+        }
         assert isinstance(item["required"], bool)
+        assert item["requirement_owner"] in {"device", "algorithm"}
         assert re.fullmatch(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+", item["id"])
     for item in document["constraints"]:
         assert set(item) == {"id", "statement"}

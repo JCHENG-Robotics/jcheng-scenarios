@@ -119,7 +119,11 @@ def _capabilities(document: dict, path: Path) -> list[dict[str, Any]]:
     capabilities: list[dict[str, Any]] = []
     requirement_ids: set[str] = set()
     capability_ids: set[str] = set()
-    for section in ("device_requirements", "algorithm_requirements"):
+    sections = (
+        ("device_requirements", "device"),
+        ("algorithm_requirements", "algorithm"),
+    )
+    for section, requirement_owner in sections:
         items = document.get(section)
         if not isinstance(items, list) or not items:
             raise RequirementsError(path, "capability.section", f"{section} must be a non-empty list")
@@ -151,16 +155,23 @@ def _capabilities(document: dict, path: Path) -> list[dict[str, Any]]:
             requirement_ids.add(requirement_id)
             capability_ids.add(capability_id)
 
-            entry: dict[str, Any] = {"id": capability_id, "required": True}
-            parameters = item.get("parameters")
-            if parameters is not None:
-                if not isinstance(parameters, dict):
-                    raise RequirementsError(
-                        path,
-                        "capability.parameters",
-                        f"{requirement_id}: parameters must be a mapping",
-                    )
-                entry["parameters"] = dict(parameters)
+            entry: dict[str, Any] = {
+                "id": capability_id,
+                "requirement_id": requirement_id,
+                "requirement_owner": requirement_owner,
+                "required": True,
+                "statement": item["requirement"],
+                "verification": item["verification"],
+            }
+            if requirement_owner == "device":
+                entry["role"] = item["role"]
+                entry["interface"] = item["interface"]
+                threshold = item.get("threshold")
+                if threshold is not None:
+                    entry["threshold"] = dict(threshold)
+            else:
+                owner = item.get("owner")
+                entry["deferred_to"] = owner if isinstance(owner, str) else None
             capabilities.append(entry)
     return capabilities
 
@@ -265,6 +276,7 @@ def build_requirements(root: Path, scenario_id: str) -> dict[str, Any]:
         "schema": REQUIREMENTS_SCHEMA,
         "scenario_id": scenario_id,
         "scenario_version": scenario_version,
+        "vocabulary_status": documents["capability_requirements"]["vocabulary_status"],
         "content_hash": "",
         "task_id": f"{documents['task']['id']}@{scenario_version}",
         "evaluation_id": f"{documents['evaluation']['id']}@{scenario_version}",

@@ -18,6 +18,9 @@ vocabulary_status: local_draft
 device_requirements:
   - id: arm_reach
     capability: manipulation.arm.reach_m
+    role: arm
+    interface: arm.position_control
+    threshold: {op: ">=", value: 0.45, unit: m}
     requirement: ">= 0.45 m from the robot base to every station centre"
     basis: design_target
     rationale: >-
@@ -26,12 +29,18 @@ device_requirements:
     verification: Unverified
   - id: arm_payload
     capability: manipulation.arm.payload_kg
+    role: arm
+    interface: arm.position_control
+    threshold: {op: ">=", value: 0.20, unit: kg}
     requirement: ">= 0.20 kg at the declared reach"
     basis: design_target
     rationale: A planning allowance for one rock plus gripper. No rock mass has been measured.
     verification: Unverified
   - id: gripper_aperture
     capability: manipulation.gripper.aperture_m
+    role: gripper
+    interface: end_effector.position_control
+    threshold: {op: ">=", value: 0.04, unit: m}
     requirement: ">= 0.04 m"
     basis: design_target
     rationale: >-
@@ -40,12 +49,17 @@ device_requirements:
     verification: Unverified
   - id: arm_dof
     capability: manipulation.arm.dof
+    role: arm
+    interface: arm.position_control
+    threshold: {op: ">=", value: 4, unit: joints}
     requirement: ">= 4 independently commanded joints"
     basis: design_target
     rationale: Enough freedom to approach a target on the pick mat and release over a bin.
     verification: Unverified
   - id: camera_resolution
     capability: sensing.camera.resolution_px
+    role: camera
+    interface: sensor.rgb_stream
     requirement: ">= 640 x 480 colour, fixed overhead mount"
     basis: design_target
     rationale: >-
@@ -55,12 +69,14 @@ device_requirements:
 algorithm_requirements:
   - id: instance_segmentation
     capability: perception.instance_segmentation
+    owner: jcheng-perception
     requirement: Separate visible ore and gangue instances in the pick area.
     basis: design_target
     rationale: The task needs instance identity; a bounding box alone cannot support per-instance success accounting.
     verification: Unverified
   - id: scene_state
     capability: perception.scene_state
+    owner: jcheng-perception
     requirement: >-
       Per-instance IDs, visible geometry, validity, freshness and explicit
       unknowns, with no fabricated 3D fields.
@@ -69,6 +85,7 @@ algorithm_requirements:
     verification: Unverified
   - id: reachability
     capability: perception.reachability
+    owner: jcheng-perception
     requirement: An advisory reachable or unreachable assessment per ore instance.
     basis: design_target
     rationale: The target_unreachable failure condition needs an explicit assessment rather than a guess.
