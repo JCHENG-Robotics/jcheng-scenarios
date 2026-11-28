@@ -98,7 +98,7 @@ def test_no_integration_is_claimed(documents: dict[str, dict]) -> None:
 def test_capability_matching_is_not_started(documents: dict[str, dict]) -> None:
     requirements = documents["capability-requirements.yaml"]
     assert requirements["matching_status"] == "Not started"
-    assert requirements["vocabulary_status"] == "local_draft"
+    assert requirements["vocabulary_status"] == "contracted"
     for requirement in requirements["device_requirements"] + requirements["algorithm_requirements"]:
         assert requirement["verification"] == "Unverified"
         assert "device_id" not in requirement
