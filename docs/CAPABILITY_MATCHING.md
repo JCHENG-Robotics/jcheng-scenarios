@@ -1,7 +1,7 @@
 # Capability matching: scenarios and devices
 
 > Status: **Contracted for offline artifacts** as of 2026-11-28 (interfaces
-> contract 1.0.0, PR #21 approval; vocabulary `contracted`). No device is
+> contract 1.0.0, PR #20 approval recorded in #21; vocabulary `contracted`). No device is
 > declared *verified* compatible with `ore_sorting`; runtime interfaces are
 > not covered by this contract.
 
