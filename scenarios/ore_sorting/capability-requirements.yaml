@@ -14,7 +14,7 @@ provenance:
       reference: AGENTS.md
       note: Hardware boundary and the ExecuteMotion authority.
 matching_status: Not started
-vocabulary_status: local_draft
+vocabulary_status: contracted
 device_requirements:
   - id: arm_reach
     capability: manipulation.arm.reach_m

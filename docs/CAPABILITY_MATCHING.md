@@ -1,8 +1,9 @@
 # Capability matching: scenarios and devices
 
-> Status: **Proposed** as of 2026-11-27; structured requirement fields and the
-> role-composed matcher were added on 2026-11-28. No device is declared
-> *verified* compatible with `ore_sorting`.
+> Status: **Contracted for offline artifacts** as of 2026-11-28 (interfaces
+> contract 1.0.0, PR #20 approval recorded in #21; vocabulary `contracted`). No device is
+> declared *verified* compatible with `ore_sorting`; runtime interfaces are
+> not covered by this contract.
 
 ## 1. Problem
 
@@ -27,10 +28,10 @@ Capability names are dotted lower-case identifiers, for example:
 | `perception.*` | `instance_segmentation`, `scene_state`, `reachability` | `jcheng-perception` / `jcheng-devices` |
 | `system.*` | `execute_motion`, `lease`, `stop_latch` | `jcheng-system` |
 
-The vocabulary is `local_draft` in v0.1.0. It becomes `proposed` when a
-`jcheng-interfaces` proposal is opened, and `contracted` only after acceptance.
-A contracted vocabulary is versioned; a scenario requirement names the version
-it was authored against.
+The vocabulary is `contracted` (offline artifact contract 1.0.0). The
+interfaces proposal was accepted on 2026-11-28 after a real owner review; this
+does not contract ROS IDL, DDS, HTTP or runtime robot profiles. A scenario
+requirement names the version it was authored against.
 
 ## 3. Requirement form
 
@@ -106,7 +107,7 @@ device meets it.
 
 | Version | Scope |
 |---|---|
-| v0.1.x | Abstract requirements with `local_draft` vocabulary (current) |
+| v0.1.x | Abstract requirements with `contracted` offline vocabulary (current) |
 | v0.3.x | Shared vocabulary proposal and offline matcher (structured fields + role composition implemented locally) |
 | v0.4.x | Matcher report consumed by applications or operations as an admission gate |
 | v1.0.0 | Contracted vocabulary and a compatibility matrix with evidence levels |

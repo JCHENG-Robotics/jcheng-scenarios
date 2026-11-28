@@ -65,7 +65,7 @@ def test_document_identity_fields() -> None:
     assert document["schema"] == REQUIREMENTS_SCHEMA
     assert document["scenario_id"] == "ore_sorting"
     assert document["scenario_version"] == "0.1.0"
-    assert document["vocabulary_status"] == "local_draft"
+    assert document["vocabulary_status"] == "contracted"
     assert document["task_id"] == "ore_sorting.task@0.1.0"
     assert document["evaluation_id"] == "ore_sorting.evaluation@0.1.0"
 
