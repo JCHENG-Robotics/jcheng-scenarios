@@ -22,7 +22,7 @@ motion.
 |---|---|
 | Layer | SCEN — outside the L0–L4 runtime dependency graph (see [`.github` `docs/repo-taxonomy.md`](https://github.com/JCHENG-Robotics/.github/blob/main/docs/repo-taxonomy.md)) |
 | Inputs | `registry.yaml`, one `scenario.yaml` per scenario, six referenced sub-profiles, the JSON Schemas under `schemas/` |
-| Outputs | A validated catalog, a deterministic text/JSON validation report and a process exit code |
+| Outputs | A validated catalog, a deterministic text/JSON validation report, a generated `jcheng.scenario_requirements.v1` JSON document, a read-only compatibility report and a process exit code |
 | Hardware access | `none` (`capability.yaml`) |
 | Owned devices | None. No `/dev/*`, serial, CAN, GPIO or camera device. |
 | Motion authority | `none`; no lease, no control path and no runtime surface |
@@ -45,6 +45,9 @@ knowledge artifact: files in, validated declarations out.
 | Operational constraints | Business, environmental and risk constraints plus the safety boundary |
 | Evaluation specification | Metrics, test levels, data-source classes and reporting ownership |
 
+The source-of-truth identifiers, content hash, generated requirements document
+and compatibility rules are in [docs/SOURCE_OF_TRUTH.md](docs/SOURCE_OF_TRUTH.md).
+
 The full field model is in [docs/SCENARIO_MODEL.md](docs/SCENARIO_MODEL.md).
 The layer boundaries and consumers are in [docs/SCEN_LAYER.md](docs/SCEN_LAYER.md).
 
@@ -59,9 +62,9 @@ jcheng-scenarios/
 ├── scenarios/
 │   ├── README.md              # catalog rules and candidate policy
 │   └── ore_sorting/           # reference scenario (7 YAML documents)
-├── src/jcheng_scenarios/      # loader, schema validation, registry, CLI
-├── tests/                     # contract, schema, registry, CLI, boundary, docs
-├── docs/                      # architecture, layer, model, audit, dependencies
+├── src/jcheng_scenarios/      # loader, schema validation, registry, hashing, requirements, compatibility, CLI
+├── tests/                     # contract, schema, registry, CLI, content, compatibility, boundary, docs
+├── docs/                      # architecture, layer, model, source of truth, audit, dependencies
 ├── evidence/                  # offline scaffold evidence only
 └── scripts/check_repo_gate.sh # required repository gate
 ```
@@ -79,6 +82,8 @@ python3 -m pip install -e '.[test]'
 jcheng-scenarios validate --root .
 jcheng-scenarios list --root .
 jcheng-scenarios show ore_sorting --root .
+jcheng-scenarios requirements ore_sorting --root . --output build/requirements.json
+jcheng-scenarios compatibility ore_sorting --root . --device-capabilities build/device.json --json
 python3 -m pytest -q
 bash scripts/check_repo_gate.sh
 ```
@@ -86,6 +91,10 @@ bash scripts/check_repo_gate.sh
 `validate` exits non-zero on the first invalid document and prints every issue
 with a code, a repository-relative path and a JSON pointer. `--json` prints a
 deterministic report for CI or an evidence archive.
+
+`requirements` writes the flattened consumer document (identifiers, content
+hash, capability ids and task constraints). `compatibility` compares it with a
+device capability document offline; a pass is never a deployment authorization.
 
 ## Validation status
 
@@ -123,6 +132,7 @@ No `LICENSE` file ships until the organization license review closes; see
 - [Schema ownership](SCHEMA_OWNERSHIP.md)
 - [SCEN layer](docs/SCEN_LAYER.md)
 - [Scenario model](docs/SCENARIO_MODEL.md)
+- [Source of truth](docs/SOURCE_OF_TRUTH.md)
 - [Capability matching](docs/CAPABILITY_MATCHING.md)
 - [Evaluation model](docs/EVALUATION_MODEL.md)
 - [Authoring guide](docs/AUTHORING.md)

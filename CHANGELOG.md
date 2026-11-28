@@ -8,6 +8,28 @@ All notable changes to this project are documented here. Format based on
 
 ### Added
 
+- MIG-02 scenario source of truth: `hashing.py` computes a canonical
+  `sha256:` content hash over the scenario profile and its referenced
+  declaration documents, with sorted mappings, preserved list order and
+  generation timestamps excluded.
+- `requirements.py` generates the `jcheng.scenario_requirements.v1` document
+  (`scenario_id`, `scenario_version`, artifact `content_hash`, versioned
+  `task_id`/`evaluation_id`, capabilities, task constraints and provenance).
+  The artifact self-hash matches the offline consumer contract; the canonical
+  scenario content hash is recorded in `provenance.scenario_content_hash`.
+  Missing, duplicate or inconsistent source documents abort generation.
+- `compatibility.py` provides an offline, read-only capability check with
+  explicit `UNKNOWN_CAPABILITY`, `MISSING_REQUIRED_CAPABILITY`,
+  `INCOMPATIBLE_PARAMETER`, `INCOMPATIBLE_VERSION`, `INCOMPATIBLE_CONTENT_HASH`
+  and `INCOMPATIBLE_SCENARIO` errors, optional-capability warnings and no
+  deployment claim (`deployable: false`).
+- CLI subcommands `requirements` (with `--json` and `--output PATH`) and
+  `compatibility` (with `--device-capabilities PATH` and `--json`).
+- `docs/SOURCE_OF_TRUTH.md` records the scenario/task/evaluation identifiers,
+  versions, hash, consumer contracts and the system/perception safety boundary.
+- Tests for hash stability and semantic scope, requirements fields and
+  inconsistency rejection, compatibility pass/unknown/missing/parameter/version
+  outcomes and malformed-input rejection.
 - `SCHEMA_OWNERSHIP.md`: every repository-local Schema now declares its owner,
   version, status (`repo-local`), consumers and promotion trigger. The contract
   test fails when a Schema file is not declared.
@@ -16,6 +38,8 @@ All notable changes to this project are documented here. Format based on
 
 ### Changed
 
+- README, README.zh-CN and the repository gate describe and exercise the
+  requirements/compatibility commands and link the source-of-truth document.
 - `capability.yaml` now uses the canonical `capability-manifest.v1` shape
   (`schema_version`, `contract`, `safety`, `hardware_access`, `runtime`) instead
   of a custom offline profile. Because the repository is offline, `class` is
