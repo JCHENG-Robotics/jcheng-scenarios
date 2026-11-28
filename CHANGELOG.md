@@ -6,6 +6,11 @@ All notable changes to this project are documented here. Format based on
 
 ## [Unreleased]
 
+### Changed
+
+- CI targets Python 3.12 only, matching the Jazzy/Ubuntu 24.04 default
+  toolchain.
+
 ### Added
 
 - MIG-02 scenario source of truth: `hashing.py` computes a canonical
