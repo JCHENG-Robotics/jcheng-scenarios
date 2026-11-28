@@ -1,7 +1,8 @@
 # Capability matching: scenarios and devices
 
-> Status: **Proposed** as of 2026-11-27. No matcher exists in v0.1.0 and no
-> device is declared compatible with `ore_sorting`.
+> Status: **Proposed** as of 2026-11-27; structured requirement fields and the
+> role-composed matcher were added on 2026-11-28. No device is declared
+> *verified* compatible with `ore_sorting`.
 
 ## 1. Problem
 
@@ -33,21 +34,32 @@ it was authored against.
 
 ## 3. Requirement form
 
-v0.1.0 records a human-readable requirement string plus a basis:
+A device requirement now carries a small, explicit grammar:
 
 ```yaml
 - id: arm_reach
   capability: manipulation.arm.reach_m
+  role: arm
+  interface: arm.position_control
+  threshold: {op: ">=", value: 0.45, unit: m}
   requirement: ">= 0.45 m from the robot base to every station centre"
   basis: design_target
   rationale: Covers the pick surface and both bins in the declared cell.
   verification: Unverified
 ```
 
-The validator checks shape and uniqueness, not the expression. A future matcher
-needs a small, explicit grammar (for example a comparator and a unit). Until
-that grammar is specified, a requirement string is documentation, not an
-executable constraint.
+- `role` selects the cell role (`arm`, `gripper`, `camera`, `base`, `sensor`,
+  `teleop`); several devices can fill different roles in one cell.
+- `interface` is the concrete device capability that must be declared, for
+  example `arm.position_control`, `end_effector.position_control` or
+  `sensor.rgb_stream`.
+- `threshold` is optional. A requirement whose fact is not declared by the
+  device is `unverified`, never `satisfied`. A camera resolution stated as two
+  dimensions is documented prose today and carries no threshold.
+
+Algorithm requirements use the same `id`/`capability` shape but name an
+`owner`; they are deferred to that owner and are never matched against a device.
+Interface requirements remain documentation for the owning repository.
 
 ## 4. Device profile (planned)
 
@@ -73,6 +85,7 @@ A future matcher reports one outcome per requirement:
 | `satisfied` | Device value meets the requirement and the evidence level is declared |
 | `unsatisfied` | Device value is below the requirement or explicitly excluded |
 | `unknown` | Device value, unit or evidence is missing; never treated as satisfied |
+| `deferred` | The requirement is owned by an algorithm repository, not a device |
 
 A report must not collapse `unknown` into `satisfied`. A scenario is
 "compatible" only when every mandatory requirement is `satisfied` at the
@@ -94,7 +107,7 @@ device meets it.
 | Version | Scope |
 |---|---|
 | v0.1.x | Abstract requirements with `local_draft` vocabulary (current) |
-| v0.3.x | Shared vocabulary proposal, device-profile schema and offline matcher |
+| v0.3.x | Shared vocabulary proposal and offline matcher (structured fields + role composition implemented locally) |
 | v0.4.x | Matcher report consumed by applications or operations as an admission gate |
 | v1.0.0 | Contracted vocabulary and a compatibility matrix with evidence levels |
 

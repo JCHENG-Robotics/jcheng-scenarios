@@ -40,14 +40,14 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/requirement"
+        "$ref": "#/$defs/device_requirement"
       }
     },
     "algorithm_requirements": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/requirement"
+        "$ref": "#/$defs/algorithm_requirement"
       }
     },
     "interface_requirements": {
@@ -128,12 +128,35 @@
     "basis": {
       "enum": ["design_target", "measured", "derived", "assumed"]
     },
-    "requirement": {
+    "role": {
+      "enum": ["arm", "gripper", "camera", "base", "sensor", "teleop"]
+    },
+    "threshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "value", "unit"],
+      "properties": {
+        "op": {
+          "enum": [">=", "<=", ">", "<", "==", "!="]
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        }
+      }
+    },
+    "device_requirement": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "id",
         "capability",
+        "role",
+        "interface",
         "requirement",
         "basis",
         "rationale",
@@ -148,6 +171,62 @@
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
           "maxLength": 120
+        },
+        "role": {
+          "$ref": "#/$defs/role"
+        },
+        "interface": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$",
+          "maxLength": 120,
+          "description": "Concrete device capability that must be declared by the device filling this role."
+        },
+        "threshold": {
+          "$ref": "#/$defs/threshold"
+        },
+        "requirement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "basis": {
+          "$ref": "#/$defs/basis"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "verification": {
+          "$ref": "#/$defs/verification"
+        }
+      }
+    },
+    "algorithm_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "capability",
+        "owner",
+        "requirement",
+        "basis",
+        "rationale",
+        "verification"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "capability": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+          "maxLength": 120
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
         },
         "requirement": {
           "type": "string",
