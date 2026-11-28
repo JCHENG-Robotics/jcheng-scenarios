@@ -55,10 +55,14 @@ def test_no_hardware_dds_or_execution_tokens_in_sources() -> None:
 
 def test_manifest_has_no_topics_or_devices() -> None:
     manifest = yaml.safe_load((ROOT / "capability.yaml").read_text(encoding="utf-8"))
-    assert manifest["topics"] == {"subscribes": [], "publishes": []}
-    assert manifest["hardware_access"]["kind"] == "none"
-    assert manifest["motion_authority"] == "none"
-    assert manifest["control_path"] == "none"
+    assert manifest["hardware_access"] == "none"
+    assert manifest["safety"]["class"] == "offline"
+    assert manifest["safety"]["scopes"] == []
+    assert manifest["runtime"] == {
+        "ros_domains": [],
+        "publishes": [],
+        "subscribes": [],
+    }
 
 
 def test_catalog_contains_no_runtime_code() -> None:

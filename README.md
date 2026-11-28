@@ -25,7 +25,7 @@ motion.
 | Outputs | A validated catalog, a deterministic text/JSON validation report and a process exit code |
 | Hardware access | `none` (`capability.yaml`) |
 | Owned devices | None. No `/dev/*`, serial, CAN, GPIO or camera device. |
-| Motion authority | `none`; `control_path: none` |
+| Motion authority | `none`; no lease, no control path and no runtime surface |
 | Forbidden | DDS or ROS 2 nodes, device access, task execution, control or intent publication, duplicating applications/simulation/benchmark runtime behaviour, fabricated parameters or results |
 
 This repository is **not** a runtime capability. No product repository imports
@@ -52,8 +52,9 @@ The layer boundaries and consumers are in [docs/SCEN_LAYER.md](docs/SCEN_LAYER.m
 
 ```text
 jcheng-scenarios/
-├── capability.yaml            # admission manifest: SCEN layer, no hardware
+├── capability.yaml            # canonical v1 manifest: offline class, no hardware
 ├── registry.yaml              # scenario registry (one entry: ore_sorting)
+├── SCHEMA_OWNERSHIP.md        # schema owner, status, consumers, promotion triggers
 ├── schemas/                   # eight versioned JSON Schemas
 ├── scenarios/
 │   ├── README.md              # catalog rules and candidate policy
@@ -108,8 +109,8 @@ or a task acceptance result. Limits are listed in [ACCEPTANCE.md](ACCEPTANCE.md)
 | [`jcheng-applications`](https://github.com/JCHENG-Robotics/jcheng-applications) | L4 | Future task-specification consumer and orchestrator. |
 | [`jcheng-simulation`](https://github.com/JCHENG-Robotics/jcheng-simulation) | SIM | Future environment-profile consumer; no asset is generated here. |
 | [`jcheng-benchmark`](https://github.com/JCHENG-Robotics/jcheng-benchmark) | BENCH | Future evaluation-specification consumer and report owner. |
-| `jcheng-devices` (planned) | — | Future device-capability profiles matched against scenario requirements. |
-| [`.github`](https://github.com/JCHENG-Robotics/.github) | L0 | Governance, documentation standard and repository taxonomy. |
+| `jcheng-devices` | L3 | Future device-capability profiles matched against scenario requirements. |
+| [`.github`](https://github.com/JCHENG-Robotics/.github) | L0 | Governance, documentation standard, repository taxonomy and the [boundary specification](https://github.com/JCHENG-Robotics/.github/blob/main/docs/repo-boundaries.md). |
 
 ## License
 
@@ -119,6 +120,7 @@ No `LICENSE` file ships until the organization license review closes; see
 ## Related
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Schema ownership](SCHEMA_OWNERSHIP.md)
 - [SCEN layer](docs/SCEN_LAYER.md)
 - [Scenario model](docs/SCENARIO_MODEL.md)
 - [Capability matching](docs/CAPABILITY_MATCHING.md)

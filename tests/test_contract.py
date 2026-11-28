@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 import yaml
 
@@ -19,6 +20,7 @@ REQUIRED = (
     "ACCEPTANCE.md",
     "VERSION",
     "LICENSE-REVIEW.md",
+    "SCHEMA_OWNERSHIP.md",
     "capability.yaml",
     "registry.yaml",
     "pyproject.toml",
@@ -62,18 +64,58 @@ def test_version_matches_package_manifest_and_catalog() -> None:
     assert profile["version"] == version
 
 
-def test_capability_manifest_is_offline_scen() -> None:
+def test_capability_manifest_is_canonical_offline() -> None:
     manifest = yaml.safe_load((ROOT / "capability.yaml").read_text(encoding="utf-8"))
+    assert set(manifest) == {
+        "schema_version",
+        "name",
+        "version",
+        "contract",
+        "safety",
+        "hardware_access",
+        "runtime",
+    }
+    assert manifest["schema_version"] == 1
     assert manifest["name"] == "jcheng-scenarios"
-    assert manifest["layer"] == "scen"
-    assert manifest["status"] == "experimental"
-    assert manifest["hardware_access"]["kind"] == "none"
-    assert manifest["motion_authority"] == "none"
-    assert manifest["control_path"] == "none"
-    assert manifest["fail_closed"] is True
-    assert manifest["topics"] == {"subscribes": [], "publishes": []}
-    assert manifest["runtime_roles"]
-    assert manifest["contracts"]["status"] == "not_applicable"
+    assert manifest["version"] == "0.1.0"
+    assert manifest["contract"] == {
+        "interfaces": ">=0.2,<0.3",
+        "contract_hash": (
+            "sha256:afca22a42f7163e0351d185d5a8577b0b51f2f3da4b92278f161a4a7d2c35b1c"
+        ),
+        "system_api": ">=0.2,<0.4",
+    }
+    assert manifest["safety"] == {
+        "class": "offline",
+        "scopes": [],
+        "requires_lease": True,
+        "max_rate_hz": 1,
+        "deadman_ms": 500,
+    }
+    assert manifest["hardware_access"] == "none"
+    assert manifest["runtime"] == {
+        "ros_domains": [],
+        "publishes": [],
+        "subscribes": [],
+    }
+
+
+def test_every_schema_is_declared_in_schema_ownership() -> None:
+    files = {
+        f"schemas/{path.name}"
+        for path in (ROOT / "schemas").glob("*.schema.json")
+    }
+    text = (ROOT / "SCHEMA_OWNERSHIP.md").read_text(encoding="utf-8")
+    declared = set(re.findall(r"\| `(schemas/[^`]+\.schema\.json)` \|", text))
+    assert declared == files, {
+        "undeclared": sorted(files - declared),
+        "missing": sorted(declared - files),
+    }
+    for line in text.splitlines():
+        if "| `schemas/" not in line:
+            continue
+        assert "`repo-local`" in line, line
+        assert "none;" in line, line
 
 
 def test_no_license_before_review() -> None:
