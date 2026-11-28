@@ -208,6 +208,7 @@
       "required": [
         "id",
         "capability",
+        "owner",
         "requirement",
         "basis",
         "rationale",

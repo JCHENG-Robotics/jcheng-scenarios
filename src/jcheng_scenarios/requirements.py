@@ -171,7 +171,13 @@ def _capabilities(document: dict, path: Path) -> list[dict[str, Any]]:
                     entry["threshold"] = dict(threshold)
             else:
                 owner = item.get("owner")
-                entry["deferred_to"] = owner if isinstance(owner, str) else None
+                if not isinstance(owner, str) or not owner:
+                    raise RequirementsError(
+                        path,
+                        "capability.owner",
+                        f"{requirement_id}: an algorithm requirement needs an owner",
+                    )
+                entry["deferred_to"] = owner
             capabilities.append(entry)
     return capabilities
 

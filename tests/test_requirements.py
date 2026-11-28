@@ -279,3 +279,15 @@ def test_document_satisfies_the_applications_reference_contract() -> None:
     )
     expected = "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     assert document["content_hash"] == expected
+
+
+def test_algorithm_requirement_without_owner_is_rejected(tmp_path: Path) -> None:
+    root = _catalog(tmp_path)
+
+    def remove_owner(document: dict) -> None:
+        del document["algorithm_requirements"][0]["owner"]
+
+    _mutate(root, "capability-requirements.yaml", remove_owner)
+    with pytest.raises(RequirementsError, match="profile.schema") as error:
+        build_requirements(root, "ore_sorting")
+    assert error.value.code == "profile.schema"
