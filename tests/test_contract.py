@@ -27,6 +27,7 @@ REQUIRED = (
     "docs/ARCHITECTURE.md",
     "docs/SCEN_LAYER.md",
     "docs/SCENARIO_MODEL.md",
+    "docs/SOURCE_OF_TRUTH.md",
     "docs/CAPABILITY_MATCHING.md",
     "docs/EVALUATION_MODEL.md",
     "docs/AUTHORING.md",
@@ -40,9 +41,12 @@ REQUIRED = (
     "src/jcheng_scenarios/__init__.py",
     "src/jcheng_scenarios/__main__.py",
     "src/jcheng_scenarios/cli.py",
+    "src/jcheng_scenarios/compatibility.py",
+    "src/jcheng_scenarios/hashing.py",
     "src/jcheng_scenarios/loader.py",
     "src/jcheng_scenarios/model.py",
     "src/jcheng_scenarios/registry.py",
+    "src/jcheng_scenarios/requirements.py",
     "src/jcheng_scenarios/schema.py",
 )
 

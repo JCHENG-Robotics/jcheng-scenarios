@@ -32,6 +32,7 @@ pyproject.toml
 docs/ARCHITECTURE.md
 docs/SCEN_LAYER.md
 docs/SCENARIO_MODEL.md
+docs/SOURCE_OF_TRUTH.md
 docs/CAPABILITY_MATCHING.md
 docs/EVALUATION_MODEL.md
 docs/AUTHORING.md
@@ -56,15 +57,21 @@ schemas/evaluation-specification.v1.schema.json
 src/jcheng_scenarios/__init__.py
 src/jcheng_scenarios/__main__.py
 src/jcheng_scenarios/cli.py
+src/jcheng_scenarios/compatibility.py
+src/jcheng_scenarios/hashing.py
 src/jcheng_scenarios/loader.py
 src/jcheng_scenarios/model.py
 src/jcheng_scenarios/registry.py
+src/jcheng_scenarios/requirements.py
 src/jcheng_scenarios/schema.py
 tests/test_cli.py
+tests/test_compatibility.py
 tests/test_contract.py
 tests/test_docs.py
+tests/test_hashing.py
 tests/test_no_hardware.py
 tests/test_registry.py
+tests/test_requirements.py
 tests/test_scenario_content.py
 tests/test_schemas.py
 evidence/README.md
@@ -119,6 +126,9 @@ PY
 step "catalog validation"
 PYTHONPATH=src python3 -m jcheng_scenarios validate --root .
 PYTHONPATH=src python3 -m jcheng_scenarios list --root .
+
+step "source of truth"
+PYTHONPATH=src python3 -m jcheng_scenarios requirements ore_sorting --root . --json >/dev/null
 
 step "tests"
 python3 -m pytest -q

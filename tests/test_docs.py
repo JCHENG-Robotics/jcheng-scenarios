@@ -80,6 +80,31 @@ def test_scen_layer_document_names_responsibilities_and_consumers() -> None:
         assert consumer in text
 
 
+def test_source_of_truth_records_identity_consumers_and_boundaries() -> None:
+    text = _text("docs/SOURCE_OF_TRUTH.md")
+    for value in (
+        "ore_sorting",
+        "ore_sorting.task",
+        "ore_sorting.evaluation",
+        "0.1.0",
+        "sha256:",
+        "jcheng.scenario_requirements.v1",
+    ):
+        assert value in text
+    for consumer in (
+        "jcheng-applications",
+        "jcheng-simulation",
+        "jcheng-benchmark",
+        "jcheng-devices",
+        "jcheng-perception",
+    ):
+        assert consumer in text
+    assert "jcheng-system" in text
+    assert "System safety stays in `jcheng-system`" in text
+    assert "not a task state" in text
+    assert "Phase" in text
+
+
 def _documents() -> list[Path]:
     return [
         ROOT / "README.md",

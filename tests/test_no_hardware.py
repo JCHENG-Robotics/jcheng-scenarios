@@ -68,4 +68,15 @@ def test_manifest_has_no_topics_or_devices() -> None:
 def test_catalog_contains_no_runtime_code() -> None:
     package = ROOT / "src" / "jcheng_scenarios"
     modules = sorted(path.name for path in package.glob("*.py"))
-    assert modules == ["__init__.py", "__main__.py", "cli.py", "loader.py", "model.py", "registry.py", "schema.py"]
+    assert modules == [
+        "__init__.py",
+        "__main__.py",
+        "cli.py",
+        "compatibility.py",
+        "hashing.py",
+        "loader.py",
+        "model.py",
+        "registry.py",
+        "requirements.py",
+        "schema.py",
+    ]

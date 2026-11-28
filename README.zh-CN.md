@@ -18,7 +18,7 @@ JCHENG Robotics 生态的声明式场景库。它把机器人应用场景——�
 |---|---|
 | 层 | SCEN——位于 L0–L4 运行时依赖图之外（见 [`.github` `docs/repo-taxonomy.md`](https://github.com/JCHENG-Robotics/.github/blob/main/docs/repo-taxonomy.md)） |
 | 输入 | `registry.yaml`、每个场景的 `scenario.yaml` 及其引用的 6 个子 profile、`schemas/` 下的 JSON Schema |
-| 输出 | 通过校验的目录、确定性的文本/JSON 校验报告、进程退出码 |
+| 输出 | 通过校验的目录、确定性的文本/JSON 校验报告、生成的 `jcheng.scenario_requirements.v1` JSON 文档、只读兼容性报告、进程退出码 |
 | 硬件访问 | `none`（`capability.yaml`） |
 | 拥有设备 | 无。没有 `/dev/*`、串口、CAN、GPIO 或相机设备。 |
 | 运动权限 | `none`；无租约、无控制路径、无运行时面 |
@@ -40,6 +40,9 @@ JCHENG Robotics 生态的声明式场景库。它把机器人应用场景——�
 | 运行约束 | 业务、环境与风险约束，以及安全边界 |
 | 评测规范 | 指标、测试层级、数据源类别与报告归属 |
 
+事实来源 ID、内容哈希、生成的 requirements 文档与兼容性规则见
+[docs/SOURCE_OF_TRUTH.md](docs/SOURCE_OF_TRUTH.md)。
+
 完整字段模型见 [docs/SCENARIO_MODEL.md](docs/SCENARIO_MODEL.md)。层边界与消费方见
 [docs/SCEN_LAYER.md](docs/SCEN_LAYER.md)。
 
@@ -53,9 +56,9 @@ jcheng-scenarios/
 ├── scenarios/
 │   ├── README.md              # 目录规则与候选场景政策
 │   └── ore_sorting/           # 参考场景（7 份 YAML）
-├── src/jcheng_scenarios/      # 加载器、Schema 校验、注册表、CLI
-├── tests/                     # 契约、Schema、注册表、CLI、边界、文档测试
-├── docs/                      # 架构、分层、模型、审计、依赖
+├── src/jcheng_scenarios/      # 加载器、Schema 校验、注册表、哈希、requirements、兼容性、CLI
+├── tests/                     # 契约、Schema、注册表、CLI、内容、兼容性、边界、文档测试
+├── docs/                      # 架构、分层、模型、事实来源、审计、依赖
 ├── evidence/                  # 仅离线脚手架证据
 └── scripts/check_repo_gate.sh # 仓库门禁
 ```
@@ -73,12 +76,17 @@ python3 -m pip install -e '.[test]'
 jcheng-scenarios validate --root .
 jcheng-scenarios list --root .
 jcheng-scenarios show ore_sorting --root .
+jcheng-scenarios requirements ore_sorting --root . --output build/requirements.json
+jcheng-scenarios compatibility ore_sorting --root . --device-capabilities build/device.json --json
 python3 -m pytest -q
 bash scripts/check_repo_gate.sh
 ```
 
 `validate` 在遇到第一个非法文档时以非零码退出，并打印每个问题的代码、
 仓库相对路径与 JSON 指针。`--json` 输出确定性报告，可用于 CI 或证据归档。
+
+`requirements` 生成扁平化的消费方文档（标识符、内容哈希、能力 ID 与任务约束）。
+`compatibility` 将其与设备能力文档做离线比对；通过不等于部署授权。
 
 ## 验证状态
 
@@ -115,6 +123,7 @@ Schema 通过不等于安全认证、设备兼容性声明或任务验收结果�
 - [架构](docs/ARCHITECTURE.md)
 - [SCEN 层](docs/SCEN_LAYER.md)
 - [场景模型](docs/SCENARIO_MODEL.md)
+- [事实来源](docs/SOURCE_OF_TRUTH.md)
 - [能力匹配](docs/CAPABILITY_MATCHING.md)
 - [评测模型](docs/EVALUATION_MODEL.md)
 - [编写指南](docs/AUTHORING.md)
